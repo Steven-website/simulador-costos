@@ -62,7 +62,7 @@ if st.button("🔄 Volver a empezar"):
 if df.empty:
     st.stop()
 
-st.subheader("📦 Filtro de Familia")
+st.subheader("📦 Filtro Familia")
 familias = df["FAMILIA"].dropna().unique()
 familia = st.selectbox("🏷️ Selecciona una familia", sorted(familias))
 
