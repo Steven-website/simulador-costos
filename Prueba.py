@@ -10,8 +10,16 @@ import requests
 # -----------------------------
 # CONFIGURACIÓN DE LA PÁGINA
 # -----------------------------
-st.set_page_config(page_title="Simulador por Categoría", layout="centered")
-st.title("🧮 Simulador de Costo de Importación (Yuan → Colón)")
+st.set_page_config(page_title="Simulador de Costos", layout="centered")
+
+# -----------------------------
+# ENCABEZADO TIPO APP
+# -----------------------------
+st.markdown("""
+<div style='text-align: center; padding-top: 10px;'>
+    <h1 style='font-size: 2.2em;'>🧮<br>Simulador de Costo de Importación<br><span style="font-size: 0.9em;">(Yuan → Colón)</span></h1>
+</div>
+""", unsafe_allow_html=True)
 
 # -----------------------------
 # CARGA DE DATOS
@@ -29,7 +37,7 @@ def cargar_datos():
 df = cargar_datos()
 
 # -----------------------------
-# OBTENER TIPO DE CAMBIO
+# TIPO DE CAMBIO
 # -----------------------------
 @st.cache_data
 def obtener_tipo_cambio():
@@ -44,20 +52,30 @@ def obtener_tipo_cambio():
     return 75.5
 
 tipo_cambio = obtener_tipo_cambio()
-st.markdown(f"💱 **Tipo de cambio actual:** ¥1 = ₡{tipo_cambio:.2f}")
+
+# Tarjeta de tipo de cambio
+st.markdown(f"""
+<div style="background-color: #f0f2f6; padding: 10px 15px; border-radius: 10px; text-align: center; margin-bottom: 20px;">
+    <span style='font-size: 18px;'>💱 <strong>Tipo de cambio actual:</strong> ¥1 = ₡{tipo_cambio:.2f}</span>
+</div>
+""", unsafe_allow_html=True)
 
 # -----------------------------
-# BOTÓN PARA REINICIAR
+# BOTÓN DE REINICIO
 # -----------------------------
-if st.button("🔄 Volver a empezar"):
-    st.markdown(
-        '<meta http-equiv="refresh" content="0;URL=\'https://simulador-costos-almacenes-el-rey.streamlit.app/\'" />',
-        unsafe_allow_html=True
-    )
-    st.stop()
+st.markdown("""
+<div style='text-align: center; margin-bottom: 30px;'>
+    <a href='https://simulador-costos-almacenes-el-rey.streamlit.app/' target='_self'>
+        <button style='background-color: #e1ecf4; border: none; color: #0366d6; padding: 10px 20px;
+                        text-align: center; font-size: 16px; border-radius: 10px; cursor: pointer;'>
+            🔄 Volver a empezar
+        </button>
+    </a>
+</div>
+""", unsafe_allow_html=True)
 
 # -----------------------------
-# FILTRO: FAMILIA
+# FILTRO FAMILIA
 # -----------------------------
 if df.empty:
     st.stop()
@@ -67,7 +85,7 @@ familias = df["FAMILIA"].dropna().unique()
 familia = st.selectbox("🏷️ Selecciona una familia", sorted(familias))
 
 # -----------------------------
-# INGRESO DEL PRECIO
+# PRECIO EN YUANES
 # -----------------------------
 precio_yuan = st.number_input("💰 Precio en Yuanes (¥)", min_value=0.0, step=0.01)
 
@@ -78,6 +96,7 @@ if precio_yuan > 0 and familia:
     resultados = df[df["FAMILIA"] == familia].copy()
     resultados["Precio Colones"] = precio_yuan * tipo_cambio
     resultados["Precio Final Estimado"] = resultados["Precio Colones"] * resultados["Factor_Importación"]
+    resultados["Precio Final Estimado"] = resultados["Precio Final Estimado"].apply(lambda x: f"₡{x:,.2f}")
 
     resultados_filtrados = resultados[["CATEGORIA", "Factor_Importación", "Precio Final Estimado"]].copy()
     resultados_filtrados = resultados_filtrados.rename(columns={
@@ -87,7 +106,7 @@ if precio_yuan > 0 and familia:
     })
 
     st.markdown("### 📊 Resultados por Categoría")
-    st.dataframe(resultados_filtrados.sort_values(by="₡ Costo CRC", ascending=False), use_container_width=True)
+    st.dataframe(resultados_filtrados, use_container_width=True)
 
 # -----------------------------
 # ESTILOS PARA CELULAR
