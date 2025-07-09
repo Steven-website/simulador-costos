@@ -54,14 +54,13 @@ if st.button("🔄 Refrescar página"):
     st.experimental_rerun()
 
 # -----------------------------
-# FILTROS: PAÍS y FAMILIA
+# FILTRO: SOLO FAMILIA (país eliminado)
 # -----------------------------
 if df.empty:
     st.stop()
 
-st.subheader("Filtros")
-pais = st.selectbox("🌍 País", sorted(df["PAIS"].dropna().unique()))
-familias = df[df["PAIS"] == pais]["FAMILIA"].dropna().unique()
+st.subheader("Filtro")
+familias = df["FAMILIA"].dropna().unique()
 familia = st.selectbox("🏷️ Familia", sorted(familias))
 
 # -----------------------------
@@ -72,8 +71,8 @@ precio_yuan = st.number_input("💰 Precio en Yuanes (¥)", min_value=0.0, step=
 # -----------------------------
 # CÁLCULO Y TABLA DE RESULTADOS
 # -----------------------------
-if precio_yuan > 0 and pais and familia:
-    resultados = df[(df["PAIS"] == pais) & (df["FAMILIA"] == familia)].copy()
+if precio_yuan > 0 and familia:
+    resultados = df[df["FAMILIA"] == familia].copy()
     resultados["Precio Colones"] = precio_yuan * tipo_cambio
     resultados["Precio Final Estimado"] = resultados["Precio Colones"] * resultados["Factor_Importación"]
 
@@ -88,7 +87,6 @@ if precio_yuan > 0 and pais and familia:
         }),
         use_container_width=True
     )
-
 
 
 # In[ ]:
