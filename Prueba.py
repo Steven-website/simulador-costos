@@ -68,7 +68,7 @@ st.markdown("""
     <a href='https://simulador-costos-almacenes-el-rey.streamlit.app/' target='_self'>
         <button style='background-color: #e1ecf4; border: none; color: #0366d6; padding: 10px 20px;
                         text-align: center; font-size: 16px; border-radius: 10px; cursor: pointer;'>
-            🔄 Volver a empezar
+            🔄 Reiniciar simulador
         </button>
     </a>
 </div>
