@@ -79,17 +79,15 @@ if precio_yuan > 0 and familia:
     resultados["Precio Colones"] = precio_yuan * tipo_cambio
     resultados["Precio Final Estimado"] = resultados["Precio Colones"] * resultados["Factor_Importación"]
 
+    resultados_filtrados = resultados[["CATEGORIA", "Factor_Importación", "Precio Final Estimado"]].copy()
+    resultados_filtrados = resultados_filtrados.rename(columns={
+        "CATEGORIA": "Categoría",
+        "Factor_Importación": "Factor de Importación",
+        "Precio Final Estimado": "₡ Costo Estimado en Costa Rica"
+    })
+
     st.markdown("### 📊 Resultados por Categoría")
-    st.dataframe(
-        resultados[["CATEGORIA", "Factor_Importación", "Precio Final Estimado"]]
-        .sort_values(by="Precio Final Estimado", ascending=False)
-        .rename(columns={
-            "CATEGORIA": "Categoría",
-            "Factor_Importación": "Factor de Importación",
-            "Precio Final Estimado": "₡ Precio Final Estimado"
-        }),
-        use_container_width=True
-    )
+    st.dataframe(resultados_filtrados.sort_values(by="₡ Costo Estimado en Costa Rica", ascending=False), use_container_width=True)
 
 # -----------------------------
 # ESTILOS PARA CELULAR
