@@ -14,17 +14,17 @@ st.set_page_config(page_title="Simulador por Categoría", layout="centered")
 st.title("🧮 Simulador de Costo de Importación (Yuan → Colón)")
 
 # -----------------------------
-# CARGA DE DATOS DESDE EL ARCHIVO EN GITHUB
+# CARGA DE DATOS
 # -----------------------------
 @st.cache_data
 def cargar_datos():
     try:
         df = pd.read_excel("Simulador.xlsx")
-        df.columns = df.columns.str.strip()  # Limpia espacios en columnas
+        df.columns = df.columns.str.strip()
         return df
     except Exception as e:
         st.error(f"❌ Error al cargar el archivo Excel: {e}")
-        return pd.DataFrame()  # Devuelve DataFrame vacío en caso de error
+        return pd.DataFrame()
 
 df = cargar_datos()
 
@@ -41,35 +41,38 @@ def obtener_tipo_cambio():
             return data["rates"]["CRC"]
     except:
         pass
-    return 75.5  # Valor por defecto
+    return 75.5
 
 tipo_cambio = obtener_tipo_cambio()
-st.write(f"💱 Tipo de cambio actual: ¥1 = ₡{tipo_cambio:.2f}")
+st.markdown(f"💱 **Tipo de cambio actual:** ¥1 = ₡{tipo_cambio:.2f}")
 
 # -----------------------------
-# BOTÓN REFRESCAR PÁGINA
+# BOTÓN PARA REINICIAR
 # -----------------------------
-if st.button("🔄 Refrescar página"):
-    st.cache_data.clear()
-    st.experimental_rerun()
+if st.button("🔄 Volver a empezar"):
+    st.markdown(
+        '<meta http-equiv="refresh" content="0;URL=\'https://simulador-costos-almacenes-el-rey.streamlit.app/\'" />',
+        unsafe_allow_html=True
+    )
+    st.stop()
 
 # -----------------------------
-# FILTRO: SOLO FAMILIA (país eliminado)
+# FILTRO: FAMILIA
 # -----------------------------
 if df.empty:
     st.stop()
 
-st.subheader("Filtro")
+st.subheader("📦 Filtro de Familia")
 familias = df["FAMILIA"].dropna().unique()
-familia = st.selectbox("🏷️ Familia", sorted(familias))
+familia = st.selectbox("🏷️ Selecciona una familia", sorted(familias))
 
 # -----------------------------
-# INGRESO DEL PRECIO EN YUANES
+# INGRESO DEL PRECIO
 # -----------------------------
 precio_yuan = st.number_input("💰 Precio en Yuanes (¥)", min_value=0.0, step=0.01)
 
 # -----------------------------
-# CÁLCULO Y TABLA DE RESULTADOS
+# CÁLCULO Y RESULTADOS
 # -----------------------------
 if precio_yuan > 0 and familia:
     resultados = df[df["FAMILIA"] == familia].copy()
@@ -87,6 +90,29 @@ if precio_yuan > 0 and familia:
         }),
         use_container_width=True
     )
+
+# -----------------------------
+# ESTILOS PARA CELULAR
+# -----------------------------
+st.markdown("""
+<style>
+    html, body, [class*="css"]  {
+        font-size: 16px;
+        padding: 0px;
+        margin: 0px;
+    }
+    input, select {
+        font-size: 18px !important;
+    }
+    .stButton button {
+        width: 100%;
+        font-size: 18px;
+    }
+    .stDataFrame div {
+        font-size: 14px !important;
+    }
+</style>
+""", unsafe_allow_html=True)
 
 
 # In[ ]:
