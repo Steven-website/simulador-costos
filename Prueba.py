@@ -99,7 +99,7 @@ if precio_yuan > 0 and familia:
     # Cálculos base
     costo_usd = precio_yuan * tipo_cambio_usd
     costo_crc = precio_yuan * tipo_cambio_crc
-    resultados["$ Costo USD"] = costo_usd * resultados["Factor_Importación"]
+    resultados["$ Costo CRC"] = costo_usd * resultados["Factor_Importación"]
     resultados["₡ Costo CRC"] = costo_crc * resultados["Factor_Importación"]
 
     # Aplica el margen desde la columna Excel
@@ -109,7 +109,7 @@ if precio_yuan > 0 and familia:
         resultados["₡ Precio CRC"] = resultados["₡ Costo CRC"]  # Fallback si no hay margen
 
     # Formato
-    resultados["$ Costo USD"] = resultados["$ Costo CRC"].apply(lambda x: f"${x:,.2f}")
+    resultados["$ Costo CRC"] = resultados["$ Costo CRC"].apply(lambda x: f"${x:,.2f}")
     resultados["₡ Costo CRC"] = resultados["₡ Costo CRC"].apply(lambda x: f"₡{x:,.2f}")
     resultados["₡ Precio CRC"] = resultados["₡ Precio CRC"].apply(lambda x: f"₡{x:,.2f}")
 
@@ -117,7 +117,7 @@ if precio_yuan > 0 and familia:
     resultados_filtrados = resultados[[ 
         "CATEGORIA", 
         "Factor_Importación", 
-        "$ Costo USD", 
+        "$ Costo CRC", 
         "₡ Costo CRC", 
         "₡ Precio CRC" 
     ]].copy()
