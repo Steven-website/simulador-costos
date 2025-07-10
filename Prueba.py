@@ -48,7 +48,7 @@ def obtener_tipos_cambio():
             return data["rates"]["CRC"], data["rates"]["USD"]
     except:
         pass
-    return 75.5, 0.14
+    return 75.5, 0.14  # Valores por defecto
 
 tipo_cambio_crc, tipo_cambio_usd = obtener_tipos_cambio()
 
@@ -96,12 +96,11 @@ precio_yuan = st.number_input("💰 Precio en Yuanes (¥)", min_value=0.0, step=
 if precio_yuan > 0 and familia:
     resultados = df[df["FAMILIA"] == familia].copy()
 
-    # Base
+    # Cálculos base
     resultados["$ Costo CN"] = precio_yuan * tipo_cambio_usd
-    resultados["$ Costo CRC"] = precio_yuan * tipo_cambio_crc
-    resultados["₡ Costo CRC"] = resultados["$ Costo CRC"] * resultados["Factor_Importación"]
+    resultados["$ Costo CRC"] = resultados["$ Costo CN"] * resultados["Factor_Importación"]
+    resultados["₡ Costo CRC"] = precio_yuan * tipo_cambio_crc * resultados["Factor_Importación"]
 
-    # Aplicar margen desde Excel
     if "Margen" in resultados.columns:
         resultados["₡ Precio CRC"] = resultados["₡ Costo CRC"] * (1 + resultados["Margen"])
     else:
@@ -109,7 +108,7 @@ if precio_yuan > 0 and familia:
 
     # Formateo
     resultados["$ Costo CN"] = resultados["$ Costo CN"].apply(lambda x: f"${x:,.2f}")
-    resultados["$ Costo CRC"] = resultados["$ Costo CRC"].apply(lambda x: f"₡{x:,.2f}")
+    resultados["$ Costo CRC"] = resultados["$ Costo CRC"].apply(lambda x: f"${x:,.2f}")
     resultados["₡ Costo CRC"] = resultados["₡ Costo CRC"].apply(lambda x: f"₡{x:,.2f}")
     resultados["₡ Precio CRC"] = resultados["₡ Precio CRC"].apply(lambda x: f"₡{x:,.2f}")
 
