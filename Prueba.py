@@ -109,7 +109,7 @@ if precio_yuan > 0 and familia:
         resultados["₡ Precio CRC"] = resultados["₡ Costo CRC"]  # Fallback si no hay margen
 
     # Formato
-    resultados["$ Costo USD"] = resultados["$ Costo USD"].apply(lambda x: f"${x:,.2f}")
+    resultados["$ Costo USD"] = resultados["$ Costo CRC"].apply(lambda x: f"${x:,.2f}")
     resultados["₡ Costo CRC"] = resultados["₡ Costo CRC"].apply(lambda x: f"₡{x:,.2f}")
     resultados["₡ Precio CRC"] = resultados["₡ Precio CRC"].apply(lambda x: f"₡{x:,.2f}")
 
