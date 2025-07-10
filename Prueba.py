@@ -96,35 +96,34 @@ precio_yuan = st.number_input("💰 Precio en Yuanes (¥)", min_value=0.0, step=
 if precio_yuan > 0 and familia:
     resultados = df[df["FAMILIA"] == familia].copy()
 
-    # Cálculos base
-    costo_usd = precio_yuan * tipo_cambio_usd
-    costo_crc = precio_yuan * tipo_cambio_crc
-    resultados["$ Costo CRC"] = costo_usd * resultados["Factor_Importación"]
-    resultados["₡ Costo CRC"] = costo_crc * resultados["Factor_Importación"]
+    # Base
+    resultados["$ Costo CN"] = precio_yuan * tipo_cambio_usd
+    resultados["$ Costo CRC"] = precio_yuan * tipo_cambio_crc
+    resultados["₡ Costo CRC"] = resultados["$ Costo CRC"] * resultados["Factor_Importación"]
 
-    # Aplica el margen desde la columna Excel
+    # Aplicar margen desde Excel
     if "Margen" in resultados.columns:
         resultados["₡ Precio CRC"] = resultados["₡ Costo CRC"] * (1 + resultados["Margen"])
     else:
-        resultados["₡ Precio CRC"] = resultados["₡ Costo CRC"]  # Fallback si no hay margen
+        resultados["₡ Precio CRC"] = resultados["₡ Costo CRC"]
 
-    # Formato
-    resultados["$ Costo CRC"] = resultados["$ Costo CRC"].apply(lambda x: f"${x:,.2f}")
+    # Formateo
+    resultados["$ Costo CN"] = resultados["$ Costo CN"].apply(lambda x: f"${x:,.2f}")
+    resultados["$ Costo CRC"] = resultados["$ Costo CRC"].apply(lambda x: f"₡{x:,.2f}")
     resultados["₡ Costo CRC"] = resultados["₡ Costo CRC"].apply(lambda x: f"₡{x:,.2f}")
     resultados["₡ Precio CRC"] = resultados["₡ Precio CRC"].apply(lambda x: f"₡{x:,.2f}")
 
-    # Selección y orden final
-    resultados_filtrados = resultados[[ 
-        "CATEGORIA", 
-        "Factor_Importación", 
-        "$ Costo CRC", 
-        "₡ Costo CRC", 
-        "₡ Precio CRC" 
+    # Tabla final
+    resultados_filtrados = resultados[[
+        "CATEGORIA",
+        "$ Costo CN",
+        "$ Costo CRC",
+        "₡ Costo CRC",
+        "₡ Precio CRC"
     ]].copy()
 
     resultados_filtrados = resultados_filtrados.rename(columns={
-        "CATEGORIA": "Categoría",
-        "Factor_Importación": "Factor"
+        "CATEGORIA": "Categoría"
     })
 
     st.markdown("### 📊 Resultados por Categoría")
@@ -152,8 +151,6 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
-
-
 
 # In[ ]:
 
