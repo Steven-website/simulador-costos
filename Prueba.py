@@ -98,27 +98,27 @@ if precio_yuan > 0 and familia:
 
     # Cálculos base
     resultados["$ Costo CN"] = precio_yuan * tipo_cambio_usd
-    resultados["$ Costo CRC"] = resultados["$ Costo CN"] * resultados["Factor_Importación"]
-    resultados["₡ Costo CRC"] = precio_yuan * tipo_cambio_crc * resultados["Factor_Importación"]
+    resultados["$ Costo CR"] = resultados["$ Costo CN"] * resultados["Factor_Importación"]
+    resultados["₡ Costo CR"] = precio_yuan * tipo_cambio_crc * resultados["Factor_Importación"]
 
     if "Margen" in resultados.columns:
-        resultados["₡ Precio CRC"] = resultados["₡ Costo CRC"] * (1 + resultados["Margen"])
+        resultados["₡ Precio CR"] = resultados["₡ Costo CR"] * (1 + resultados["Margen"])
     else:
-        resultados["₡ Precio CRC"] = resultados["₡ Costo CRC"]
+        resultados["₡ Precio CR"] = resultados["₡ Costo CR"]
 
     # Formateo
     resultados["$ Costo CN"] = resultados["$ Costo CN"].apply(lambda x: f"${x:,.2f}")
-    resultados["$ Costo CRC"] = resultados["$ Costo CRC"].apply(lambda x: f"${x:,.2f}")
-    resultados["₡ Costo CRC"] = resultados["₡ Costo CRC"].apply(lambda x: f"₡{x:,.2f}")
-    resultados["₡ Precio CRC"] = resultados["₡ Precio CRC"].apply(lambda x: f"₡{x:,.2f}")
+    resultados["$ Costo CR"] = resultados["$ Costo CR"].apply(lambda x: f"${x:,.2f}")
+    resultados["₡ Costo CR"] = resultados["₡ Costo CR"].apply(lambda x: f"₡{x:,.2f}")
+    resultados["₡ Precio CR"] = resultados["₡ Precio CR"].apply(lambda x: f"₡{x:,.2f}")
 
     # Tabla final
     resultados_filtrados = resultados[[
         "CATEGORIA",
         "$ Costo CN",
-        "$ Costo CRC",
-        "₡ Costo CRC",
-        "₡ Precio CRC"
+        "$ Costo CR",
+        "₡ Costo CR",
+        "₡ Precio CR"
     ]].copy()
 
     resultados_filtrados = resultados_filtrados.rename(columns={
