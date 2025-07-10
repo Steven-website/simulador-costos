@@ -54,6 +54,11 @@ def obtener_tipos_cambio():
 tipo_cambio_crc, tipo_cambio_usd = obtener_tipos_cambio()
 
 # -----------------------------
+# MARGEN ADICIONAL (editable si se desea)
+# -----------------------------
+margen = 0.25  # 25%
+
+# -----------------------------
 # TARJETA DE TIPO DE CAMBIO
 # -----------------------------
 st.markdown(f"""
@@ -97,10 +102,12 @@ precio_yuan = st.number_input("💰 Precio en Yuanes (¥)", min_value=0.0, step=
 if precio_yuan > 0 and familia:
     resultados = df[df["FAMILIA"] == familia].copy()
 
-    # Base
-    resultados["$ Costo USD"] = precio_yuan * tipo_cambio_usd
-    resultados["₡ Costo CRC"] = precio_yuan * tipo_cambio_crc
-    resultados["₡ Precio CRC"] = resultados["₡ Costo CRC"] * resultados["Factor_Importación"]
+    # Cálculos base
+    costo_usd = precio_yuan * tipo_cambio_usd
+    costo_crc = precio_yuan * tipo_cambio_crc
+    resultados["$ Costo USD"] = costo_usd * resultados["Factor_Importación"]
+    resultados["₡ Costo CRC"] = costo_crc * resultados["Factor_Importación"]
+    resultados["₡ Precio CRC"] = resultados["₡ Costo CRC"] * (1 + margen)
 
     # Formato
     resultados["$ Costo USD"] = resultados["$ Costo USD"].apply(lambda x: f"${x:,.2f}")
@@ -146,6 +153,7 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
+
 
 # In[ ]:
 
