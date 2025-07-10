@@ -13,7 +13,7 @@ import requests
 st.set_page_config(page_title="Simulador de Costos", layout="centered")
 
 # -----------------------------
-# ENCABEZADO TIPO APP
+# ENCABEZADO
 # -----------------------------
 st.markdown("""
 <div style='text-align: center; padding-top: 10px;'>
@@ -49,11 +49,13 @@ def obtener_tipos_cambio():
             return data["rates"]["CRC"], data["rates"]["USD"]
     except:
         pass
-    return 75.5, 0.14  # Valores por defecto
+    return 75.5, 0.14
 
 tipo_cambio_crc, tipo_cambio_usd = obtener_tipos_cambio()
 
-# Tarjeta de tipo de cambio
+# -----------------------------
+# TARJETA DE TIPO DE CAMBIO
+# -----------------------------
 st.markdown(f"""
 <div style="background-color: #f0f2f6; padding: 10px 15px; border-radius: 10px; text-align: center; margin-bottom: 20px;">
     <span style='font-size: 18px;'>💱 <strong>Tipo de cambio:</strong> ¥1 = ₡{tipo_cambio_crc:.2f} | ${tipo_cambio_usd:.4f}</span>
@@ -95,23 +97,23 @@ precio_yuan = st.number_input("💰 Precio en Yuanes (¥)", min_value=0.0, step=
 if precio_yuan > 0 and familia:
     resultados = df[df["FAMILIA"] == familia].copy()
 
-    # Cálculo base
-    resultados["Precio CRC"] = precio_yuan * tipo_cambio_crc
-    resultados["₡ Costo CRC"] = resultados["Precio CRC"] * resultados["Factor_Importación"]
-    resultados["₡ Costo CRC"] = resultados["₡ Costo CRC"].apply(lambda x: f"₡{x:,.2f}")
-    resultados["₡ Precio CRC"] = resultados["Precio CRC"].apply(lambda x: f"₡{x:,.2f}")
+    # Base
+    resultados["$ Costo USD"] = precio_yuan * tipo_cambio_usd
+    resultados["₡ Costo CRC"] = precio_yuan * tipo_cambio_crc
+    resultados["₡ Precio CRC"] = resultados["₡ Costo CRC"] * resultados["Factor_Importación"]
 
-    resultados["Precio USD"] = precio_yuan * tipo_cambio_usd
-    resultados["$ Costo USD"] = resultados["Precio USD"] * resultados["Factor_Importación"]
+    # Formato
     resultados["$ Costo USD"] = resultados["$ Costo USD"].apply(lambda x: f"${x:,.2f}")
+    resultados["₡ Costo CRC"] = resultados["₡ Costo CRC"].apply(lambda x: f"₡{x:,.2f}")
+    resultados["₡ Precio CRC"] = resultados["₡ Precio CRC"].apply(lambda x: f"₡{x:,.2f}")
 
-    # Selección y renombre de columnas en orden solicitado
+    # Selección y orden final
     resultados_filtrados = resultados[[
         "CATEGORIA",
         "Factor_Importación",
         "$ Costo USD",
-        "₡ Precio CRC",
-        "₡ Costo CRC"
+        "₡ Costo CRC",
+        "₡ Precio CRC"
     ]].copy()
 
     resultados_filtrados = resultados_filtrados.rename(columns={
