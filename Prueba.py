@@ -95,17 +95,25 @@ precio_yuan = st.number_input("💰 Precio en Yuanes (¥)", min_value=0.0, step=
 if precio_yuan > 0 and familia:
     resultados = df[df["FAMILIA"] == familia].copy()
 
-    # Colones
-    resultados["Precio Colones"] = precio_yuan * tipo_cambio_crc
-    resultados["₡ Costo CRC"] = resultados["Precio Colones"] * resultados["Factor_Importación"]
+    # Cálculo base
+    resultados["Precio CRC"] = precio_yuan * tipo_cambio_crc
+    resultados["₡ Costo CRC"] = resultados["Precio CRC"] * resultados["Factor_Importación"]
     resultados["₡ Costo CRC"] = resultados["₡ Costo CRC"].apply(lambda x: f"₡{x:,.2f}")
+    resultados["₡ Precio CRC"] = resultados["Precio CRC"].apply(lambda x: f"₡{x:,.2f}")
 
-    # Dólares
     resultados["Precio USD"] = precio_yuan * tipo_cambio_usd
     resultados["$ Costo USD"] = resultados["Precio USD"] * resultados["Factor_Importación"]
     resultados["$ Costo USD"] = resultados["$ Costo USD"].apply(lambda x: f"${x:,.2f}")
 
-    resultados_filtrados = resultados[["CATEGORIA", "Factor_Importación", "$ Costo USD", "₡ Costo CRC"]].copy()
+    # Selección y renombre de columnas en orden solicitado
+    resultados_filtrados = resultados[[
+        "CATEGORIA",
+        "Factor_Importación",
+        "$ Costo USD",
+        "₡ Precio CRC",
+        "₡ Costo CRC"
+    ]].copy()
+
     resultados_filtrados = resultados_filtrados.rename(columns={
         "CATEGORIA": "Categoría",
         "Factor_Importación": "Factor"
@@ -136,7 +144,6 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
-
 
 # In[ ]:
 
