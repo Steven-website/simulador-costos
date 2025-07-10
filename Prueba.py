@@ -105,7 +105,7 @@ if precio_yuan > 0 and familia:
     resultados["$ Costo USD"] = resultados["Precio USD"] * resultados["Factor_Importación"]
     resultados["$ Costo USD"] = resultados["$ Costo USD"].apply(lambda x: f"${x:,.2f}")
 
-    resultados_filtrados = resultados[["CATEGORIA", "Factor_Importación", "₡ Costo CRC", "$ Costo USD"]].copy()
+    resultados_filtrados = resultados[["CATEGORIA", "Factor_Importación", "$ Costo USD", "₡ Costo CRC"]].copy()
     resultados_filtrados = resultados_filtrados.rename(columns={
         "CATEGORIA": "Categoría",
         "Factor_Importación": "Factor"
