@@ -17,7 +17,7 @@ st.set_page_config(page_title="Simulador de Costos", layout="centered")
 # -----------------------------
 st.markdown("""
 <div style='text-align: center; padding-top: 10px;'>
-    <h1 style='font-size: 2.2em;'>🧮<br>Simulador de Costo de Importación<br><span style="font-size: 0.9em;">(Yuan → Colón)</span></h1>
+    <h1 style='font-size: 2.2em;'>🧮<br>Simulador de Costo de Importación<br><span style="font-size: 0.9em;">(Yuan → Colón / Dólar)</span></h1>
 </div>
 """, unsafe_allow_html=True)
 
@@ -40,23 +40,23 @@ df = cargar_datos()
 # TIPO DE CAMBIO
 # -----------------------------
 @st.cache_data
-def obtener_tipo_cambio():
+def obtener_tipos_cambio():
     try:
         url = "https://open.er-api.com/v6/latest/CNY"
         response = requests.get(url, timeout=10)
         data = response.json()
         if data.get("result") == "success":
-            return data["rates"]["CRC"]
+            return data["rates"]["CRC"], data["rates"]["USD"]
     except:
         pass
-    return 75.5
+    return 75.5, 0.14  # Valores por defecto
 
-tipo_cambio = obtener_tipo_cambio()
+tipo_cambio_crc, tipo_cambio_usd = obtener_tipos_cambio()
 
 # Tarjeta de tipo de cambio
 st.markdown(f"""
 <div style="background-color: #f0f2f6; padding: 10px 15px; border-radius: 10px; text-align: center; margin-bottom: 20px;">
-    <span style='font-size: 18px;'>💱 <strong>Tipo de cambio actual:</strong> ¥1 = ₡{tipo_cambio:.2f}</span>
+    <span style='font-size: 18px;'>💱 <strong>Tipo de cambio:</strong> ¥1 = ₡{tipo_cambio_crc:.2f} | ${tipo_cambio_usd:.4f}</span>
 </div>
 """, unsafe_allow_html=True)
 
@@ -94,15 +94,21 @@ precio_yuan = st.number_input("💰 Precio en Yuanes (¥)", min_value=0.0, step=
 # -----------------------------
 if precio_yuan > 0 and familia:
     resultados = df[df["FAMILIA"] == familia].copy()
-    resultados["Precio Colones"] = precio_yuan * tipo_cambio
-    resultados["Precio Final Estimado"] = resultados["Precio Colones"] * resultados["Factor_Importación"]
-    resultados["Precio Final Estimado"] = resultados["Precio Final Estimado"].apply(lambda x: f"₡{x:,.2f}")
 
-    resultados_filtrados = resultados[["CATEGORIA", "Factor_Importación", "Precio Final Estimado"]].copy()
+    # Colones
+    resultados["Precio Colones"] = precio_yuan * tipo_cambio_crc
+    resultados["₡ Costo CRC"] = resultados["Precio Colones"] * resultados["Factor_Importación"]
+    resultados["₡ Costo CRC"] = resultados["₡ Costo CRC"].apply(lambda x: f"₡{x:,.2f}")
+
+    # Dólares
+    resultados["Precio USD"] = precio_yuan * tipo_cambio_usd
+    resultados["$ Costo USD"] = resultados["Precio USD"] * resultados["Factor_Importación"]
+    resultados["$ Costo USD"] = resultados["$ Costo USD"].apply(lambda x: f"${x:,.2f}")
+
+    resultados_filtrados = resultados[["CATEGORIA", "Factor_Importación", "₡ Costo CRC", "$ Costo USD"]].copy()
     resultados_filtrados = resultados_filtrados.rename(columns={
         "CATEGORIA": "Categoría",
-        "Factor_Importación": "Factor",
-        "Precio Final Estimado": "₡ Costo CRC"
+        "Factor_Importación": "Factor"
     })
 
     st.markdown("### 📊 Resultados por Categoría")
